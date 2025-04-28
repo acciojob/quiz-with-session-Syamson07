@@ -1,1 +1,23 @@
 /*  your css code here. If applicable */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f0f0f0;
+}
+
+#questions {
+    margin-bottom: 20px;
+}
+
+#submit {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#score {
+    margin-top: 20px;
+    font-size: 20px;
+    font-weight: bold;
+}
