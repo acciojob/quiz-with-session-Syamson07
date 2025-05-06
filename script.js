@@ -1,8 +1,8 @@
 const questions = [
   {
-    question: "What is the capital of France?",
-    options: ["Paris", "London", "Berlin", "Rome"],
-    answer: "Paris"
+    question: "What is the highest mountain in the world?",
+    options: ["K2", "Everest", "Kilimanjaro", "Makalu"],
+    answer: "Everest"
   },
   {
     question: "What is 2 + 2?",
@@ -30,39 +30,42 @@ const questionContainer = document.getElementById("questions");
 const submitButton = document.getElementById("submit");
 const scoreDisplay = document.getElementById("score");
 
-// Load saved progress from sessionStorage
 let savedProgress = JSON.parse(sessionStorage.getItem("progress")) || {};
 let finalScore = localStorage.getItem("score");
 
-// Display questions
+// Render questions and answers
 questions.forEach((q, index) => {
   const qDiv = document.createElement("div");
-  qDiv.innerHTML = `<p>${q.question}</p>`;
-  
+  const p = document.createElement("p");
+  p.textContent = q.question;
+  qDiv.appendChild(p);
+
   q.options.forEach(option => {
-    const id = `q${index}_${option}`;
-    const checked = savedProgress[index] === option ? "checked" : "";
-    qDiv.innerHTML += `
-      <label>
-        <input type="radio" name="q${index}" value="${option}" ${checked}>
-        ${option}
-      </label><br>
-    `;
+    const label = document.createElement("label");
+    const input = document.createElement("input");
+
+    input.type = "radio";
+    input.name = `q${index}`;
+    input.value = option;
+    if (savedProgress[index] === option) {
+      input.checked = true; // Use property instead of HTML attribute
+    }
+
+    input.addEventListener("change", () => {
+      savedProgress[index] = input.value;
+      sessionStorage.setItem("progress", JSON.stringify(savedProgress));
+    });
+
+    label.appendChild(input);
+    label.append(` ${option}`);
+    qDiv.appendChild(label);
+    qDiv.appendChild(document.createElement("br"));
   });
 
   questionContainer.appendChild(qDiv);
 });
 
-// Update sessionStorage on selection
-document.querySelectorAll("input[type='radio']").forEach(input => {
-  input.addEventListener("change", (e) => {
-    const [questionIndex] = e.target.name.match(/\d+/);
-    savedProgress[questionIndex] = e.target.value;
-    sessionStorage.setItem("progress", JSON.stringify(savedProgress));
-  });
-});
-
-// Submit quiz
+// Calculate and display score
 submitButton.addEventListener("click", () => {
   let score = 0;
   questions.forEach((q, i) => {
@@ -73,7 +76,7 @@ submitButton.addEventListener("click", () => {
   localStorage.setItem("score", score);
 });
 
-// Show score if already submitted
+// Show previous score if it exists
 if (finalScore !== null) {
   scoreDisplay.textContent = `Your score is ${finalScore} out of ${questions.length}.`;
 }
