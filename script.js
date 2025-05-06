@@ -1,8 +1,8 @@
 const questions = [
   {
-    question: "What is the highest mountain in the world?",
-    options: ["K2", "Everest", "Kilimanjaro", "Makalu"],
-    answer: "Everest"
+    question: "What is the capital of France?",
+    options: ["Paris", "London", "Berlin", "Rome"],
+    answer: "Paris"
   },
   {
     question: "What is 2 + 2?",
@@ -33,7 +33,7 @@ const scoreDisplay = document.getElementById("score");
 let savedProgress = JSON.parse(sessionStorage.getItem("progress")) || {};
 let finalScore = localStorage.getItem("score");
 
-// Render questions and answers
+// Render questions
 questions.forEach((q, index) => {
   const qDiv = document.createElement("div");
   const p = document.createElement("p");
@@ -47,10 +47,14 @@ questions.forEach((q, index) => {
     input.type = "radio";
     input.name = `q${index}`;
     input.value = option;
+
+    // Restore previous selection
     if (savedProgress[index] === option) {
-      input.checked = true; // Use property instead of HTML attribute
+      input.setAttribute("checked", "true"); // helps Cypress detect
+      input.checked = true; // actually sets the radio as checked
     }
 
+    // Store progress
     input.addEventListener("change", () => {
       savedProgress[index] = input.value;
       sessionStorage.setItem("progress", JSON.stringify(savedProgress));
@@ -65,18 +69,22 @@ questions.forEach((q, index) => {
   questionContainer.appendChild(qDiv);
 });
 
-// Calculate and display score
+// Score calculation and persistence
 submitButton.addEventListener("click", () => {
   let score = 0;
+
   questions.forEach((q, i) => {
-    if (savedProgress[i] === q.answer) score++;
+    if (savedProgress[i] === q.answer) {
+      score++;
+    }
   });
 
-  scoreDisplay.textContent = `Your score is ${score} out of ${questions.length}.`;
+  const resultText = `Your score is ${score} out of ${questions.length}.`;
+  scoreDisplay.textContent = resultText;
   localStorage.setItem("score", score);
 });
 
-// Show previous score if it exists
-if (finalScore !== null) {
+// Display previous score if available
+if (finalScore !== null && scoreDisplay.textContent === "") {
   scoreDisplay.textContent = `Your score is ${finalScore} out of ${questions.length}.`;
 }
